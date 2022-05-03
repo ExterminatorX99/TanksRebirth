@@ -258,7 +258,7 @@ namespace TanksRebirth.GameContent
 
             if ((int)tier <= (int)TankTier.Marble)
                 _tankTexture = Assets[$"tank_" + tier.ToString().ToLower()];
-            
+
             #region Special
 
             if (tier == TankTier.Commando)
@@ -1684,7 +1684,7 @@ namespace TanksRebirth.GameContent
         {
             base.LayFootprint(alt);
         }
-        
+
         public bool pathBlocked;
 
         public bool isEnemySpotted;
@@ -2056,7 +2056,7 @@ namespace TanksRebirth.GameContent
                         bool isMineNear = TryGetMineNear(AiParams.MineWarinessRadius, out var mine);
 
                         #region CubeNav
-                        
+
                         if (Behaviors[2].IsModOf(AiParams.BlockReadTime) && !isMineNear && !isBulletNear)
                         {
                             pathBlocked = IsObstacleInWay(AiParams.BlockWarinessDistance, Vector2.UnitY.RotatedByRadians(-TargetTankRotation), out var travelPath, out var refPoints);
@@ -2377,11 +2377,11 @@ namespace TanksRebirth.GameContent
                         var rot = pos.ToRotation();
                         var posNew = new Vector2(50, 0).RotatedByRadians(rot);
                         DebugUtils.DrawDebugString(TankGame.spriteBatch, "here?",
-                            GeometryUtils.ConvertWorldToScreen(new(posNew.X, 11, posNew.Y), 
-                            Matrix.CreateTranslation(Position.X, 
-                            0, Position.Y), View, Projection), 
+                            GeometryUtils.ConvertWorldToScreen(new(posNew.X, 11, posNew.Y),
+                            Matrix.CreateTranslation(Position.X,
+                            0, Position.Y), View, Projection),
                             1, centered: true);*/
-                        
+
                         foreach (var pt in refPoints)
                         {
                             DebugUtils.DrawDebugString(TankGame.spriteBatch, "pt", GeometryUtils.ConvertWorldToScreen(new Vector3(0, 11, 0), Matrix.CreateTranslation(pt.X, 0, pt.Y), View, Projection), 1, centered: true);

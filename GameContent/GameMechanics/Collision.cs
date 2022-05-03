@@ -262,7 +262,7 @@ namespace TanksRebirth.GameContent.GameMechanics
             else if (collisionInfo.Normal == Vector2.Zero)
             {
                 direction = CollisionDirection.Other;
-                
+
             }
         }
 

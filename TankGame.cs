@@ -116,7 +116,7 @@ namespace TanksRebirth
         {
             get
             {
-                using Process process = Process.GetCurrentProcess(); 
+                using Process process = Process.GetCurrentProcess();
                 return process.PrivateMemorySize64;
             }
             private set { }
@@ -260,7 +260,7 @@ namespace TanksRebirth
 
             DiscordRichPresence.Terminate();
         }
-        
+
         protected override void LoadContent()
         {
             try
@@ -485,7 +485,7 @@ namespace TanksRebirth
                             // GameCamera.Zoom(DEFAULT_ZOOM * AddativeZoom);
                             GameCamera.SetPosition(pos - new Vector3(0, 0, 100).FlattenZ().RotatedByRadians(-x.TurretRotation).ExpandZ());
 
-                            GameCamera.SetLookAt(pos + new Vector3(0, 0, 20).FlattenZ().RotatedByRadians(-x.TurretRotation).ExpandZ());                        
+                            GameCamera.SetLookAt(pos + new Vector3(0, 0, 20).FlattenZ().RotatedByRadians(-x.TurretRotation).ExpandZ());
                             GameCamera.Zoom(GameUtils.MousePosition.X / GameUtils.WindowWidth * 5);
                             GameCamera.SetFov(90);
                             //GameCamera.SetPosition(pos);

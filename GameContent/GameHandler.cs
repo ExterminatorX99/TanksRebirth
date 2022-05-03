@@ -74,7 +74,7 @@ namespace TanksRebirth.GameContent
         public static void DoEndMissionWorkload(int delay, MissionEndContext context, bool result1up) // bool major = (if true, play M100 fanfare, else M20)
         {
             IntermissionSystem.SetTime(delay);
-            
+
             TankMusicSystem.StopAll();
 
             if (context == MissionEndContext.CampaignCompleteMajor)
@@ -284,7 +284,7 @@ namespace TanksRebirth.GameContent
                 Thunder.SoftRain.Play();
             }
             Thunder.SoftRain.Volume = TankGame.Settings.AmbientVolume;
-            
+
             if (GameRand.NextFloat(0, 1f) <= 0.003f)
             {
                 var rand = new Range<Thunder.ThunderType>(Thunder.ThunderType.Fast, Thunder.ThunderType.Instant2);
@@ -314,7 +314,7 @@ namespace TanksRebirth.GameContent
 
             GameLight.Color = Color.Multiply(Color.DeepSkyBlue, 0.5f); // DeepSkyBlue
 
-            
+
             if (brightest is not null)
             {
                 TankGame.ClearColor = Color.DeepSkyBlue * brightest.CurBright;
@@ -476,7 +476,7 @@ namespace TanksRebirth.GameContent
 
             foreach (var body in Tank.CollisionsWorld.BodyList)
             {
-                DebugUtils.DrawDebugString(TankGame.spriteBatch, $"BODY", 
+                DebugUtils.DrawDebugString(TankGame.spriteBatch, $"BODY",
                     GeometryUtils.ConvertWorldToScreen(Vector3.Zero, Matrix.CreateTranslation(body.Position.X, 0, body.Position.Y), TankGame.GameView, TankGame.GameProjection), centered: true);
             }
             // TODO: Fix translation
@@ -526,7 +526,7 @@ namespace TanksRebirth.GameContent
             {
                 if (IntermissionSystem.IsAwaitingNewMission)
                 {
-                    
+
                 }
                 for (int i = -4; i < 10; i++)
                 {
@@ -716,7 +716,7 @@ namespace TanksRebirth.GameContent
         public static AITank SpawnTank(TankTier tier, TankTeam team)
         {
             var rot = GeometryUtils.GetPiRandom();
-            
+
             var t = new AITank(tier)
             {
                 TankRotation = rot,
@@ -835,7 +835,7 @@ namespace TanksRebirth.GameContent
                             ChatSystem.SendMessage("Failed to load mission.", Color.Red);
                         }
                     }*/
-                    
+
                     var res = Dialog.FileOpen("mission", TankGame.SaveDirectory);
                     if (res.Path != null && res.IsOk)
                     {
@@ -843,7 +843,7 @@ namespace TanksRebirth.GameContent
                         {
                             LoadedCampaign.LoadMission(Mission.Load(res.Path, null));
                             LoadedCampaign.SetupLoadedMission(true);
-                            
+
                             ChatSystem.SendMessage($"Loaded mission '{Path.GetFileNameWithoutExtension(res.Path)}'.", Color.White);
                         }
                         catch
