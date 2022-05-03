@@ -499,20 +499,20 @@ namespace TanksRebirth.GameContent
             {
                 element?.DrawTooltips(TankGame.spriteBatch);
             }
-            tankToSpawnType = MathHelper.Clamp(tankToSpawnType, 2, Enum.GetValues<TankTier>().Length - 1);
-            tankToSpawnTeam = MathHelper.Clamp(tankToSpawnTeam, 0, Enum.GetValues<TankTeam>().Length - 1);
+            tankToSpawnType = MathHelper.Clamp(tankToSpawnType, 2, TankTiers.Length - 1);
+            tankToSpawnTeam = MathHelper.Clamp(tankToSpawnTeam, 0, TankTeams.Length - 1);
 
             #region TankInfo
             DebugUtils.DrawDebugString(TankGame.spriteBatch, "Spawn Tank With Info:", GameUtils.WindowTop + new Vector2(0, 8), 3, centered: true);
-            DebugUtils.DrawDebugString(TankGame.spriteBatch, $"Tier: {Enum.GetNames<TankTier>()[tankToSpawnType]}", GameUtils.WindowTop + new Vector2(0, 24), 3, centered: true);
-            DebugUtils.DrawDebugString(TankGame.spriteBatch, $"Team: {Enum.GetNames<TankTeam>()[tankToSpawnTeam]}", GameUtils.WindowTop + new Vector2(0, 40), 3, centered: true);
+            DebugUtils.DrawDebugString(TankGame.spriteBatch, $"Tier: {TankTierNames[tankToSpawnType]}", GameUtils.WindowTop + new Vector2(0, 24), 3, centered: true);
+            DebugUtils.DrawDebugString(TankGame.spriteBatch, $"Team: {TankTeamNames[tankToSpawnTeam]}", GameUtils.WindowTop + new Vector2(0, 40), 3, centered: true);
             DebugUtils.DrawDebugString(TankGame.spriteBatch, $"CubeStack: {CubeHeight} | CubeType: {Enum.GetNames<Block.BlockType>()[BlockType]}", GameUtils.WindowBottom - new Vector2(0, 20), 3, centered: true);
 
             DebugUtils.DrawDebugString(TankGame.spriteBatch, $"HighestTier: {AITank.GetHighestTierActive()}", new(10, GameUtils.WindowHeight * 0.26f), 1);
             DebugUtils.DrawDebugString(TankGame.spriteBatch, $"CurSong: {(Music.AllMusic.FirstOrDefault(music => music.Volume == 0.5f) != null ? Music.AllMusic.FirstOrDefault(music => music.Volume == 0.5f).Name : "N/A")}", new(10, GameUtils.WindowHeight - 100), 1);
-            for (int i = 0; i < Enum.GetNames<TankTier>().Length; i++)
+            for (int i = 0; i < TankTierNames.Length; i++)
             {
-                DebugUtils.DrawDebugString(TankGame.spriteBatch, $"{Enum.GetNames<TankTier>()[i]}: {AITank.GetTankCountOfType((TankTier)i)}", new(10, GameUtils.WindowHeight * 0.3f + (i * 20)), 1);
+                DebugUtils.DrawDebugString(TankGame.spriteBatch, $"{TankTierNames[i]}: {AITank.GetTankCountOfType((TankTier)i)}", new(10, GameUtils.WindowHeight * 0.3f + (i * 20)), 1);
             }
             #endregion
 
@@ -783,6 +783,11 @@ namespace TanksRebirth.GameContent
         public static UITextButton LoadCampaign;
 
         private static int mode;
+
+        public static readonly TankTier[] TankTiers = Enum.GetValues<TankTier>();
+        public static readonly TankTeam[] TankTeams = Enum.GetValues<TankTeam>();
+        public static readonly string[] TankTierNames = Enum.GetNames<TankTier>();
+        public static readonly string[] TankTeamNames = Enum.GetNames<TankTeam>();
 
         public static void InitDebugUi()
         {
