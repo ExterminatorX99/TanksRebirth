@@ -128,6 +128,7 @@ namespace TanksRebirth.GameContent
         }
         private static void DoEndScene()
         {
+            PlayerTank.TanksKillDict.Clear();
             MainMenu.Open();
             // this will be finished later...
         }
@@ -162,7 +163,7 @@ namespace TanksRebirth.GameContent
                     if (TankMusicSystem.Songs is not null)
                         foreach (var song in TankMusicSystem.Songs)
                             song.Volume = 0;
-            foreach (var expl in Explosion.explosions)
+            foreach (var expl in Explosion.Explosions)
                 expl?.Update();
 
             if (Difficulties.Types["ThunderMode"])
@@ -251,7 +252,7 @@ namespace TanksRebirth.GameContent
                 new Powerup(powerups[mode]) { Position = GameUtils.GetWorldPosition(GameUtils.MousePosition).FlattenZ() };
 
             if (MainMenu.Active)
-                PlayerTank.TanksKilledThisCampaign = 0;
+                PlayerTank.KillCount = 0;
 
             CubeHeight = MathHelper.Clamp(CubeHeight, 1, 7);
             BlockType = MathHelper.Clamp(BlockType, 0, 3);
@@ -451,7 +452,7 @@ namespace TanksRebirth.GameContent
                 bullet?.Render();
 
             TankGame.Instance.GraphicsDevice.BlendState = BlendState.Additive;
-            foreach (var expl in Explosion.explosions)
+            foreach (var expl in Explosion.Explosions)
                 expl?.Render();
             TankGame.Instance.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
 
@@ -516,9 +517,9 @@ namespace TanksRebirth.GameContent
             }
             #endregion
 
-            DebugUtils.DrawDebugString(TankGame.spriteBatch, $"Logic Time: {TankGame.LogicTime}" +
+            DebugUtils.DrawDebugString(TankGame.spriteBatch, $"Logic Time: {TankGame.LogicTime.TotalMilliseconds:0.00}ms" +
                 $"\nLogic FPS: {TankGame.LogicFPS}" +
-                $"\n\nRender Time: {TankGame.RenderTime}" +
+                $"\n\nRender Time: {TankGame.RenderTime.TotalMilliseconds:0.00}ms" +
                 $"\nRender FPS: {TankGame.RenderFPS}", new(10, 500));
 
             DebugUtils.DrawDebugString(TankGame.spriteBatch, $"Current Mission: {LoadedCampaign.CurrentMission.Name}\nCurrent Campaign: {LoadedCampaign.Properties.Name}", GameUtils.WindowBottomLeft - new Vector2(-4, 40), 3, centered: false);
@@ -532,7 +533,7 @@ namespace TanksRebirth.GameContent
                 {
                     IntermissionSystem.DrawShadowedTexture(GameResources.GetGameResource<Texture2D>("Assets/textures/ui/scoreboard"), new Vector2(i * 14, GameUtils.WindowHeight * 0.9f), Vector2.UnitY, Color.White, new(2f, 2f), 1f, new(0, GameResources.GetGameResource<Texture2D>("Assets/textures/ui/scoreboard").Size().Y / 2), true);
                 }
-                IntermissionSystem.DrawShadowedString(new Vector2(80, GameUtils.WindowHeight * 0.89f), Vector2.One, $"{PlayerTank.TanksKilledThisCampaign}", new(119, 190, 238), new(0.675f), 1f);
+                IntermissionSystem.DrawShadowedString(new Vector2(80, GameUtils.WindowHeight * 0.89f), Vector2.One, $"{PlayerTank.KillCount}", new(119, 190, 238), new(0.675f), 1f);
             }
             IntermissionSystem.Draw(TankGame.spriteBatch);
 
@@ -581,7 +582,7 @@ namespace TanksRebirth.GameContent
         {
              new(1000, 50f, (tnk) => { tnk.MaxSpeed *= 2; }, (tnk) => { tnk.MaxSpeed /= 2; }) { Name = "Speed" },
              new(1000, 50f, (tnk) => { tnk.Invisible = !tnk.Invisible; }, (tnk) => tnk.Invisible = !tnk.Invisible) { Name = "InvisSwap" },
-             new(1000, 50f, (tnk) => { tnk.ShellHoming.radius = 150f; tnk.ShellHoming.speed = tnk.ShellSpeed; tnk.ShellHoming.power = 1f; }, (tnk) => tnk.ShellHoming = new()) { Name = "Homing" },
+             new(1000, 50f, (tnk) => { tnk.ShellHoming.Radius = 150f; tnk.ShellHoming.Speed = tnk.ShellSpeed; tnk.ShellHoming.Power = 1f; }, (tnk) => tnk.ShellHoming = new()) { Name = "Homing" },
              new(1000, 50f, (tnk) => { if (tnk.MaxSpeed > 0) tnk.Stationary = true; }, (tnk) => { if (tnk.MaxSpeed > 0) tnk.Stationary = !tnk.Stationary; }) { Name = "Stationary" }
         };
 
@@ -683,7 +684,7 @@ namespace TanksRebirth.GameContent
             foreach (var bullet in Shell.AllShells)
                 bullet?.Remove();
 
-            foreach (var expl in Explosion.explosions)
+            foreach (var expl in Explosion.Explosions)
                 expl?.Remove();
 
             foreach (var crate in Crate.crates)

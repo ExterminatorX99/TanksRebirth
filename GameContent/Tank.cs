@@ -62,7 +62,7 @@ namespace TanksRebirth.GameContent
         ByExplosion,
         Other
     }
-    public abstract class Tank
+    public abstract class Tank : ITankProperties
     {
         public static Dictionary<string, Texture2D> Assets = new();
 
@@ -301,17 +301,17 @@ namespace TanksRebirth.GameContent
 
                 lightParticle.Scale = new(0.25f);
                 lightParticle.Opacity = 0f;
-                lightParticle.is2d = true;
+                lightParticle.Is2d = true;
 
                 lightParticle.UniqueBehavior = (lp) =>
                 {
-                    lp.position = Position3D;
+                    lp.Position = Position3D;
                     if (lp.Scale.X < 5f)
                         GeometryUtils.Add(ref lp.Scale, 0.12f);
                     if (lp.Opacity < 1f && lp.Scale.X < 5f)
                         lp.Opacity += 0.02f;
 
-                    if (lp.lifeTime > 90)
+                    if (lp.LifeTime > 90)
                         lp.Opacity -= 0.005f;
 
                     if (lp.Scale.X < 0f)
@@ -330,10 +330,10 @@ namespace TanksRebirth.GameContent
 
                     lp.UniqueBehavior = (elp) =>
                     {
-                        elp.position.X += velocity.X;
-                        elp.position.Z += velocity.Y;
+                        elp.Position.X += velocity.X;
+                        elp.Position.Z += velocity.Y;
 
-                        if (elp.lifeTime > 15)
+                        if (elp.LifeTime > 15)
                         {
                             GeometryUtils.Add(ref elp.Scale, -0.03f);
                             elp.Opacity -= 0.03f;
@@ -458,13 +458,13 @@ namespace TanksRebirth.GameContent
 
                     part.Scale = new(0.55f);
 
-                    part.color = TankDestructionColor;
+                    part.Color = TankDestructionColor;
 
                     part.UniqueBehavior = (p) =>
                     {
-                        part.Pitch += MathF.Sin(part.position.Length() / 10);
+                        part.Pitch += MathF.Sin(part.Position.Length() / 10);
                         vel.Y -= 0.2f;
-                        part.position += vel;
+                        part.Position += vel;
                         part.Opacity -= 0.025f;
 
                         if (part.Opacity <= 0f)
@@ -474,11 +474,11 @@ namespace TanksRebirth.GameContent
 
                 var partExpl = ParticleSystem.MakeParticle(Position3D, GameResources.GetGameResource<Texture2D>("Assets/textures/misc/bot_hit"));
 
-                partExpl.color = Color.Yellow * 0.75f;
+                partExpl.Color = Color.Yellow * 0.75f;
 
                 partExpl.Scale = new(5f);
 
-                partExpl.is2d = true;
+                partExpl.Is2d = true;
 
                 partExpl.UniqueBehavior = (p) =>
                 {
@@ -528,7 +528,7 @@ namespace TanksRebirth.GameContent
                     shell.Velocity = new Vector3(-new2d.X, 0, new2d.Y) * ShellSpeed;
 
                     shell.Owner = this;
-                    shell.ricochets = RicochetCount;
+                    shell.RicochetsLeft = RicochetCount;
 
                     #region Particles
                     var hit = ParticleSystem.MakeParticle(shell.Position, GameResources.GetGameResource<Texture2D>("Assets/textures/misc/bot_hit"));
@@ -540,7 +540,7 @@ namespace TanksRebirth.GameContent
                     smoke.Scale = new(0.35f);
                     hit.Scale = new(0.5f);
 
-                    smoke.color = new(84, 22, 0, 255);
+                    smoke.Color = new(84, 22, 0, 255);
 
                     smoke.isAddative = false;
 
@@ -549,24 +549,24 @@ namespace TanksRebirth.GameContent
 
                     hit.UniqueBehavior = (part) =>
                     {
-                        part.color = Color.Orange;
+                        part.Color = Color.Orange;
 
-                        if (part.lifeTime > 1)
+                        if (part.LifeTime > 1)
                             part.Opacity -= 0.1f;
                         if (part.Opacity <= 0)
                             part.Destroy();
                     };
                     smoke.UniqueBehavior = (part) =>
                     {
-                        part.color.R = (byte)GameUtils.RoughStep(part.color.R, achieveable, step);
-                        part.color.G = (byte)GameUtils.RoughStep(part.color.G, achieveable, step);
-                        part.color.B = (byte)GameUtils.RoughStep(part.color.B, achieveable, step);
+                        part.Color.R = (byte)GameUtils.RoughStep(part.Color.R, achieveable, step);
+                        part.Color.G = (byte)GameUtils.RoughStep(part.Color.G, achieveable, step);
+                        part.Color.B = (byte)GameUtils.RoughStep(part.Color.B, achieveable, step);
 
                         GeometryUtils.Add(ref part.Scale, 0.004f);
 
-                        if (part.color.G == achieveable)
+                        if (part.Color.G == achieveable)
                         {
-                            part.color.B = (byte)achieveable;
+                            part.Color.B = (byte)achieveable;
                             part.Opacity -= 0.04f;
 
                             if (part.Opacity <= 0)
@@ -598,7 +598,7 @@ namespace TanksRebirth.GameContent
                     shell.Velocity = new Vector3(-new2d.X, 0, new2d.Y).FlattenZ().RotatedByRadians(newAngle).ExpandZ() * ShellSpeed;
 
                     shell.Owner = this;
-                    shell.ricochets = RicochetCount;
+                    shell.RicochetsLeft = RicochetCount;
                 }
             }
 
@@ -666,6 +666,56 @@ namespace TanksRebirth.GameContent
             GameHandler.OnMissionStart -= OnMissionStart;
         }
     }
+
+    public interface ITankProperties
+    {
+        /// <summary>Whether or not the tank has artillery-like function during gameplay.</summary>
+        bool Stationary { get; set; }
+        /// <summary>Whether or not the tank has been destroyed or not.</summary>
+        bool Dead { get; set; }
+        /// <summary>Whether or not the tank should become invisible at mission start.</summary>
+        bool Invisible { get; set; }
+        /// <summary>How fast the tank should accelerate towards its <see cref="MaxSpeed"/>.</summary>
+        float Acceleration { get; set; }
+        /// <summary>How fast the tank should decelerate when not moving.</summary>
+        float Deceleration { get; set; }
+        /// <summary>The current speed of this tank.</summary>
+        float Speed { get; set; }
+        /// <summary>The maximum speed this tank can achieve.</summary>
+        float MaxSpeed { get; set; }
+        /// <summary>How fast the bullets this <see cref="Tank"/> shoot are.</summary>
+        float ShellSpeed { get; set; }
+        /// <summary>The rotation of this <see cref="Tank"/>'s barrel. Generally should not be modified in a player context.</summary>
+        float TurretRotation { get; set; }
+        /// <summary>The rotation of this <see cref="Tank"/>.</summary>
+        float TankRotation { get; set; }
+        /// <summary>The pitch of the footprint placement sounds.</summary>
+        float TreadPitch { get; set; }
+        /// <summary>The pitch of the shoot sound.</summary>
+        float ShootPitch { get; set; }
+        /// <summary>The type of bullet this <see cref="Tank"/> shoots.</summary>
+        ShellTier ShellType { get; set; }
+        /// <summary>The maximum amount of mines this <see cref="Tank"/> can place.</summary>
+        int MineLimit { get; set; }
+        /// <summary>How long this <see cref="Tank"/> will be immobile upon firing a bullet.</summary>
+        int ShootStun { get; set; }
+        /// <summary>How long this <see cref="Tank"/> will be immobile upon laying a mine.</summary>
+        int MineStun { get; set; }
+        /// <summary>How long this <see cref="Tank"/> has to wait until it can fire another bullet..</summary>
+        int ShellCooldown { get; set; }
+        /// <summary>How long until this <see cref="Tank"/> can lay another mine</summary>
+        int MineCooldown { get; set; }
+        /// <summary>How many times the <see cref="Shell"/> this <see cref="Tank"/> shoots ricochets.</summary>
+        int RicochetCount { get; set; }
+        /// <summary>The amount of <see cref="Shell"/>s this <see cref="Tank"/> can own on-screen at any given time.</summary>
+        int ShellLimit { get; set; }
+        /// <summary>How fast this <see cref="Tank"/> turns.</summary>
+        public float TurningSpeed { get; set; }
+        /// <summary>The maximum angle this <see cref="Tank"/> can turn (in radians) before it has to start pivoting.</summary>
+        float MaximalTurn { get; set; }
+        /// <summary>Whether or not this <see cref="Tank"/> can lay a <see cref="TankFootprint"/>.</summary>
+        public bool CanLayTread { get; set; }
+    }
     public class TankFootprint
     {
         public const int MAX_FOOTPRINTS = 100000;
@@ -715,9 +765,9 @@ namespace TanksRebirth.GameContent
         {
             lifeTime++;
 
-            track.position = Position;
+            track.Position = Position;
             track.Pitch = rotation;
-            track.color = Color.White;
+            track.Color = Color.White;
             // Vector3 scale = alternate ? new(0.5f, 1f, 0.35f) : new(0.5f, 1f, 0.075f);
             // [0.0, 1.1, 1.5, 0.5]
             // [0.0, 0.1, 0.8, 0.0]
@@ -768,7 +818,7 @@ namespace TanksRebirth.GameContent
 
         public void Render()
         {
-            check.position = Position;
+            check.Position = Position;
             check.Scale = new(0.6f);
         }
     }
